@@ -29,7 +29,16 @@ const Folders  = ({parent, folders, setFolders, setParent, path, setPath}) =>{
 
     const handleFolderOpen = (id, name) => {
         setParent(id)
-        setPath(path + '>'+ name)
+        
+        let newPath = '/' + name
+        
+        let temp_path = [...path]
+
+        temp_path.push({id:id, currentPath:newPath});
+
+        setPath(temp_path);
+
+        console.log(path)
     }
 
     const deletefolder=(parentId, id) =>{
