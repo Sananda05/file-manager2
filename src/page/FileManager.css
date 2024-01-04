@@ -2,7 +2,9 @@
     position: relative;
     height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
+   
 }
 
 .add_button{
@@ -21,6 +23,18 @@
     top: 10px;
     right: 35px;
     cursor: pointer;
+}
+
+.file_path{
+    width: 60%;
+    height: 100px;
+    /* background-color: var(--gray); */
+    border-radius: 5px;
+    color: var(--secondary-purple);
+    padding: 1rem;
+    margin-top: 4rem;
+    align-self: start;
+    margin-left: 7rem;
 }
 
 

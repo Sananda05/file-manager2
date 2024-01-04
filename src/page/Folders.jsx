@@ -1,40 +1,53 @@
 import React from "react";
 import { useState } from "react";
 
-import {Alert} from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-
 import folderIcon from '../assets/icon/folder.png'
 import deleteIcon from '../assets/icon/remove.png'
 
 import './Folders.css'
 
-const Folders  = ({parent, folders, setFolders, setParent}) =>{
+const Folders  = ({parent, folders, setFolders, setParent, path, setPath}) =>{
 
     const [showAlert, setShowAlert] = useState(false);
 
     const [deleteId, setDeleteId] = useState(null)
+    const [deleteParentId, setDeleteParentId] = useState(null)
 
     const handleDeleteConfirmation = () =>{
        
         setShowAlert(false)
-        deletefolder(deleteId)
+        deletefolder(deleteParentId, deleteId)
+        console.log(deleteParentId)
     }
 
-    const handleAlertModal = (id) => {
+    const handleAlertModal = (parent, id) => {
         setShowAlert(!showAlert);
-        setDeleteId(id)
+        setDeleteId(id);
+        setDeleteParentId(parent)
+        
     };
 
-    const deletefolder=(id) =>{
+    const handleFolderOpen = (id, name) => {
+        setParent(id)
+        setPath(path + '>'+ name)
+    }
+
+    const deletefolder=(parentId, id) =>{
 
        const updatedFolders = { ...folders };
 
-        // Delete the specified folder by its ID
-        delete updatedFolders[id];
+       delete updatedFolders[id];
 
-        // Update the state with the modified folders
+
+       const parentFolder = updatedFolders[parentId];
+
+        if (parentFolder) {
+        
+        parentFolder.childs = parentFolder.childs.filter((child) => child !== id);
+        }
+
+        console.log(updatedFolders)
+
         setFolders(updatedFolders);
     }
 
@@ -46,12 +59,12 @@ const Folders  = ({parent, folders, setFolders, setParent}) =>{
                 if(thisFolder.parent !== parent)return null;
 
                 return <div className={`folder_content ${thisFolder === folders[id] ? 'selected' : ''}`}>
-                <div style={{display:"flex", flexDirection:"row", justifyContent:"center", alignItems:"center"}} onClick={() => { setParent(id)}}>
+                <div style={{display:"flex", flexDirection:"row", justifyContent:"center", alignItems:"center"}} onClick={() => handleFolderOpen(id, thisFolder.title) }>
                 <img src={folderIcon} alt="folder" style={{height:'24px', width:'24px'}}/>
                 <h4>{thisFolder.title}</h4>
                 </div>
                 <img src={deleteIcon} alt="Add" style={{height:"16px", width:"16px", marginLeft:'7rem'}}
-                   onClick={()=> handleAlertModal(id)} />
+                   onClick={()=> handleAlertModal(thisFolder.parent,id)} />
                 </div>
             })}
 

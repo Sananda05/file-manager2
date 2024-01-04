@@ -10,6 +10,9 @@ import './FileManager.css'
 
 function FileManager(){
         const [parent, setParent] = useState(0);
+
+        const [path, setPath] = useState("main")
+
         const [folders, setFolders] = useState({
             id1: {title: 'Folder 1', parent: 0, childs:['id4', 'id5']},
             id2: {title: 'Folder 2', parent: 0, childs:['id3']},
@@ -53,7 +56,8 @@ function FileManager(){
                 <p style={{fontSize:"14px"}}>Add New Folder</p>
                 
             </div>
-            <Folders parent={parent} folders={folders} setFolders={setFolders} setParent={setParent}/>
+            <div className='file_path'>{path}</div>
+            <Folders parent={parent} folders={folders} setFolders={setFolders} setParent={setParent} path={path} setPath={setPath}/>
 
 
             {isOpen ? 
