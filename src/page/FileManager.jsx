@@ -1,39 +1,83 @@
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Folders from './Folders';
 
 import addIcon from '../assets/icon/plus.png'
 import folderIcon from '../assets/icon/folder.png'
 
+
 import './FileManager.css'
 import BreadCrumbs from './BreadCrumbs';
 
 
+
 function FileManager(){
+
         const [parent, setParent] = useState(0);
 
         const [path, setPath] = useState([{id:'', currentPath:'Main:'}])
 
-        const [folders, setFolders] = useState({
-            id1: {title: 'Folder 1', parent: 0, childs:['id4', 'id5']},
-            id2: {title: 'Folder 2', parent: 0, childs:['id3']},
-            id3: {title: 'Folder 2.1', parent: 'id2', childs:[]},
-            id4: {title: 'Folder 1.1', parent: 'id1', childs:[]},
-            id5: {title: 'Folder 1.2', parent: 'id1', childs:[]},
+        // const [folders, setFolders] = useState({
+        //     id1: {title: 'Folder 1', parent: 0, childs:['id4', 'id5']},
+        //     id2: {title: 'Folder 2', parent: 0, childs:['id3']},
+        //     id3: {title: 'Folder 2.1', parent: 'id2', childs:[]},
+        //     id4: {title: 'Folder 1.1', parent: 'id1', childs:[]},
+        //     id5: {title: 'Folder 1.2', parent: 'id1', childs:[]},
+        // })
+
+        const [folders, setFolders] = useState(() => {
+            const storedFolders = localStorage.getItem('folders');
+
+            return storedFolders ? JSON.parse(storedFolders) : {
+              id1: { title: 'Folder 1', parent: 0, childs: ['id4', 'id5'] },
+              id2: { title: 'Folder 2', parent: 0, childs: ['id3'] },
+              id3: { title: 'Folder 2.1', parent: 'id2', childs: [] },
+              id4: { title: 'Folder 1.1', parent: 'id1', childs: [] },
+              id5: { title: 'Folder 1.2', parent: 'id1', childs: [] },
+            };
+          });  
+
+        const [isOpen, setIsOpen] = useState(false)
+        
+        const folderNameRef = useRef("")
+
+        useEffect(()=>{
+            localStorage.setItem('folders', JSON.stringify(folders) )
+        }, [folders])
+
+
+
+        const handleModalOpener = (e)=>{
+
+            setIsOpen(!isOpen)
+
+        }
+
+        const handleFolderSort = () => {
+
+        const foldersArray = Object.entries(folders).map(([key , value]) => ({id: key, ...value}))
+
+        console.log("folders Array", foldersArray)
+
+        foldersArray.sort((folder1, folder2) => {
+
+            if(folder1.title < folder2.title){
+                return -1;
+            }
+            if(folder1.title > folder2.title){
+                return 1;
+            }
+            return 0;
         })
 
-      const [isOpen, setIsOpen] = useState(false)
-      
-      const folderNameRef = useRef("")
+        const sortedFolders = Object.assign({}, foldersArray)
 
-      const handleModalOpener = (e)=>{
+        setFolders(sortedFolders)
 
-        setIsOpen(!isOpen)
+        }
 
-      }
-
-      const handlePathClick = (id) =>{
+        const handlePathClick = (id) =>{
 
         const filteredPath = path.filter((item, index) => index <= id);
 
@@ -52,9 +96,9 @@ function FileManager(){
         }
         console.log(clickedPath.id)
         
-      }
+        }
       
-      const handleAddNewFolder = (e) =>{
+        const handleAddNewFolder = (e) =>{
 
         e.preventDefault();
 
@@ -66,33 +110,37 @@ function FileManager(){
         ...prevFolders,
         [newFolderId]: newFolder,
         }));
-
+        
         folderNameRef.current.value =""
 
-      }
+        }
 
 
-      return (
-        <div className='main_container' >
-            <div className="add_button" onClick={handleModalOpener}>
-                <img src={addIcon} alt="Add" style={{height:"16px", width:"16px"}} />
-                <p style={{fontSize:"14px"}}>Add New Folder</p>
-                
-            </div>
-            <div style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'center', marginTop:'5rem', gap:'10px'}}> 
-                <img src={folderIcon} alt='folder' style={{height:'16px', width:'16px', marginLeft:'7rem'}}/>
-                <div className='file_path'>
-                    {Object.keys(path).map(id =>{
-                        let pathHistory = path[id]
-                        return <a onClick={(e)=>handlePathClick(id)}> <p>{pathHistory.currentPath}</p></a>
-                    } )}
+        return (
+            <div className='main_container' >
+                <div className="add_button" onClick={handleModalOpener}>
+                    <img src={addIcon} alt="Add" style={{height:"16px", width:"16px"}} />
+                    <p style={{fontSize:"14px"}}>Add New Folder</p>
+                    
                 </div>
-            </div>
+                <div style={{display:'flex', flexDirection:'row', alignItems:'center', justifyContent:'center', marginTop:'5rem', gap:'10px'}}> 
+                    <img src={folderIcon} alt='folder' style={{height:'16px', width:'16px', marginLeft:'7rem'}}/>
+                    <div className='file_path'>
+                        {Object.keys(path).map(id =>{
+                            let pathHistory = path[id]
+                            return <a onClick={(e)=>handlePathClick(id)}> <p>{pathHistory.currentPath}</p></a>
+                        } )}
+                    </div>
+                </div>
 
             {/* <BreadCrumbs parent={parent} folders={folders} setFolders={setFolders} setParent={setParent}/> */}
+            <div className='header_section'>
+            <h4 style={{color:'black', height:'100px', width:'300px', marginTop:'6rem'}}>Folders</h4>
+            <button className='sort_button' onClick={handleFolderSort}>A ~ Z</button>
+            </div>
             <Folders className='file_path' parent={parent} folders={folders} setFolders={setFolders} setParent={setParent} path={path} setPath={setPath}/>
 
-
+           
             {isOpen ? 
             <div className="modal_container">
                 <div className={`modal ${isOpen ? 'open' : ''}`}>          

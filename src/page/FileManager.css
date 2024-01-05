@@ -33,10 +33,25 @@
     border-radius: 5px;
     cursor: pointer;
     color: var(--secondary-purple);
-    
-  
 }
 
+.header_section{
+    display: flex;
+    flex-direction: row;
+    width: 90%;
+    height: 100px;
+    justify-content:space-between;
+    align-items: center;
+    margin-top:'4rem'
+}
+
+.sort_button{
+    border: none;
+    height: 40px;
+    width: 100px;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
 .modal_container{
     position: fixed;
