@@ -15,9 +15,10 @@ html{
   --light-purple: #7975f0 ;
   --inactive-black: #343434;
   --white: #ffffff;
-  --gray: #e7e7e7;
-  --yellow: #f7e1bd;
-  --orange: rgb(190, 63, 41);
+  --gray: #dae6f5;
+  --yellow: #f8f8f8;
+  --orange: rgb(138, 31, 7);
+  --red:  #f0dcdc;
   
 }
 
