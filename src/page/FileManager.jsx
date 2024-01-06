@@ -8,7 +8,6 @@ import folderIcon from "../assets/icon/folder.png";
 
 import "./FileManager.css";
 import BreadCrumbs from "./BreadCrumbs";
-import { CleaningServices } from "@mui/icons-material";
 
 function FileManager() {
   const [parent, setParent] = useState(0);
