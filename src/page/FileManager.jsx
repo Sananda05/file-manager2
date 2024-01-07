@@ -1,5 +1,3 @@
-// import { v4 as uuidv4 } from 'uuid';
-
 import { useState, useRef, useEffect } from "react";
 import Folders from "./Folders";
 
@@ -8,6 +6,8 @@ import folderIcon from "../assets/icon/folder.png";
 
 import "./FileManager.css";
 import BreadCrumbs from "./BreadCrumbs";
+import AddFolderModal from "../component/modal/AddFolderModal";
+import { SortFolder } from "../utils/SortFolder";
 
 function FileManager() {
   const [parent, setParent] = useState(0);
@@ -15,6 +15,12 @@ function FileManager() {
   const [path, setPath] = useState([{ id: "", currentPath: "Main:" }]);
 
   const [color, setcolor] = useState(["#dae6f5"]);
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const folderNameRef = useRef("");
 
   // const [folders, setFolders] = useState({
   //     id1: {title: 'Folder 1', parent: 0, childs:['id4', 'id5']},
@@ -38,41 +44,12 @@ function FileManager() {
         };
   });
 
-  const [isOpen, setIsOpen] = useState(false);
-
-  const folderNameRef = useRef("");
-
   useEffect(() => {
     localStorage.setItem("folders", JSON.stringify(folders));
   }, [folders]);
 
   const handleModalOpener = (e) => {
     setIsOpen(!isOpen);
-  };
-
-  const handleFolderSort = () => {
-    const foldersArray = Object.entries(folders).map(([key, value]) => ({
-      id: key,
-      ...value,
-    }));
-
-    console.log("folders Array", foldersArray);
-
-    foldersArray.sort((folder1, folder2) => {
-      if (folder1.title < folder2.title) {
-        return -1;
-      }
-      if (folder1.title > folder2.title) {
-        return 1;
-      }
-      return 0;
-    });
-
-    const sortedFolders = Object.assign({}, foldersArray);
-
-    console.log(sortedFolders);
-
-    setFolders(sortedFolders);
   };
 
   const handlePathClick = (id) => {
@@ -95,21 +72,17 @@ function FileManager() {
   const handleAddNewFolder = (e) => {
     e.preventDefault();
 
+    if (folderNameRef.current.value === "") {
+      setErrorMessage("Please enter a folder name.");
+      return;
+    }
+
     const newFolderId = `id${Object.keys(folders).length + 1}`;
     const newFolder = {
       title: folderNameRef.current.value,
       parent,
       childs: [],
     };
-
-    // if(e.key === 'Enter')
-    // {
-    //     setFolders((prevFolders) => ({
-    //         ...prevFolders,
-    //         [newFolderId]: newFolder,
-    //         }));
-
-    // }
 
     setFolders((prevFolders) => {
       if (prevFolders[parent]) {
@@ -122,6 +95,8 @@ function FileManager() {
       };
     });
 
+    setIsOpen(!isOpen);
+    setErrorMessage("");
     folderNameRef.current.value = "";
   };
 
@@ -174,7 +149,10 @@ function FileManager() {
         >
           Folders
         </h4>
-        <button className="sort_button" onClick={handleFolderSort}>
+        <button
+          className="sort_button"
+          onClick={() => SortFolder({ folders, setFolders })}
+        >
           Sort A~Z
         </button>
       </div>
@@ -191,29 +169,13 @@ function FileManager() {
       />
 
       {isOpen ? (
-        <div className="modal_container">
-          <div className={`modal ${isOpen ? "open" : ""}`}>
-            <div className="modal-content">
-              <form onSubmit={handleAddNewFolder}>
-                <input
-                  type="text"
-                  placeholder="Folder Name"
-                  id="folder_name"
-                  name="name"
-                  ref={folderNameRef}
-                />
-                <div className="modal_button_group">
-                  <button className="cancel_btn" onClick={handleModalOpener}>
-                    cancel
-                  </button>
-                  <button className="create_btn" type="submit">
-                    create
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+        <AddFolderModal
+          isOpen={isOpen}
+          handleAddNewFolder={handleAddNewFolder}
+          folderNameRef={folderNameRef}
+          errorMessage={errorMessage}
+          handleModalOpener={handleModalOpener}
+        />
       ) : (
         <div></div>
       )}
