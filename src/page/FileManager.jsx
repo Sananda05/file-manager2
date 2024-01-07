@@ -7,7 +7,7 @@ import folderIcon from "../assets/icon/folder.png";
 import "./FileManager.css";
 import BreadCrumbs from "./BreadCrumbs";
 import AddFolderModal from "../component/modal/AddFolderModal";
-import { SortFolder } from "../utils/SortFolder";
+import { SortFolder } from "../utils/SortFolderfunction";
 
 function FileManager() {
   const [parent, setParent] = useState(0);
@@ -21,14 +21,6 @@ function FileManager() {
   const [isOpen, setIsOpen] = useState(false);
 
   const folderNameRef = useRef("");
-
-  // const [folders, setFolders] = useState({
-  //     id1: {title: 'Folder 1', parent: 0, childs:['id4', 'id5']},
-  //     id2: {title: 'Folder 2', parent: 0, childs:['id3']},
-  //     id3: {title: 'Folder 2.1', parent: 'id2', childs:[]},
-  //     id4: {title: 'Folder 1.1', parent: 'id1', childs:[]},
-  //     id5: {title: 'Folder 1.2', parent: 'id1', childs:[]},
-  // })
 
   const [folders, setFolders] = useState(() => {
     const storedFolders = localStorage.getItem("folders");
