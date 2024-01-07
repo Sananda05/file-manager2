@@ -5,9 +5,10 @@ import addIcon from "../assets/icon/plus.png";
 import folderIcon from "../assets/icon/folder.png";
 
 import "./FileManager.css";
-import BreadCrumbs from "./BreadCrumbs";
+
 import AddFolderModal from "../component/modal/AddFolderModal";
 import { SortFolder } from "../utils/SortFolderfunction";
+import { AddNewFolder } from "../utils/AddNewFolder";
 
 function FileManager() {
   const [parent, setParent] = useState(0);
@@ -59,37 +60,6 @@ function FileManager() {
       setParent(clickedPath.id);
     }
     // console.log(clickedPath.id)
-  };
-
-  const handleAddNewFolder = (e) => {
-    e.preventDefault();
-
-    if (folderNameRef.current.value === "") {
-      setErrorMessage("Please enter a folder name.");
-      return;
-    }
-
-    const newFolderId = `id${Object.keys(folders).length + 1}`;
-    const newFolder = {
-      title: folderNameRef.current.value,
-      parent,
-      childs: [],
-    };
-
-    setFolders((prevFolders) => {
-      if (prevFolders[parent]) {
-        prevFolders[parent]?.childs.push(newFolderId);
-      }
-
-      return {
-        ...prevFolders,
-        [newFolderId]: newFolder,
-      };
-    });
-
-    setIsOpen(!isOpen);
-    setErrorMessage("");
-    folderNameRef.current.value = "";
   };
 
   return (
@@ -163,7 +133,18 @@ function FileManager() {
       {isOpen ? (
         <AddFolderModal
           isOpen={isOpen}
-          handleAddNewFolder={handleAddNewFolder}
+          handleAddNewFolder={(e) =>
+            AddNewFolder({
+              e,
+              folderNameRef,
+              setErrorMessage,
+              folders,
+              setFolders,
+              parent,
+              setIsOpen,
+              isOpen,
+            })
+          }
           folderNameRef={folderNameRef}
           errorMessage={errorMessage}
           handleModalOpener={handleModalOpener}
