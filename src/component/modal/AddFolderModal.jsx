@@ -5,6 +5,12 @@ const AddFolderModal = ({
   errorMessage,
   handleModalOpener,
 }) => {
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddNewFolder(e);
+    }
+  };
   return (
     <div className="modal_container">
       <div className={`modal ${isOpen ? "open" : ""}`}>
@@ -16,6 +22,7 @@ const AddFolderModal = ({
               id="folder_name"
               name="name"
               ref={folderNameRef}
+              onKeyDown={handleKeyDown}
             />
             {errorMessage && (
               <p
