@@ -1,27 +1,52 @@
-import React, { useState } from "react";
+import React from "react";
 
-const BreadCrumbs = ({parent, folders, setParent}) =>{
+import folderIcon from "../assets/icon/folder.png";
 
-    const [path, setPath] = useState([])
+const BreadCrumbs = ({ path, setPath, setParent }) => {
+  const handlePathClick = (id) => {
+    const filteredPath = path.filter((item, index) => index <= id);
 
+    setPath(filteredPath);
 
-    return(
-        <div>
-           {Object.keys(folders).map(id =>{
-              let thisFolder = folders[id];
-              if(thisFolder.parent === parent)
-              {
-              let newPath = '/' + thisFolder.title
-        
-              let temp_path = [...path]
+    let clickedPath = path[id];
 
-              temp_path.push({currentPath:newPath});
+    // console.log("clickedPath", clickedPath)
 
-              setPath(temp_path); 
-              }
+    if (clickedPath.id === "") {
+      setParent(0);
+    } else {
+      setParent(clickedPath.id);
+    }
+    // console.log(clickedPath.id)
+  };
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: "5rem",
+        gap: "10px",
+      }}
+    >
+      <img
+        src={folderIcon}
+        alt="folder"
+        style={{ height: "16px", width: "16px", marginLeft: "7rem" }}
+      />
+      <div className="file_path">
+        {Object.keys(path).map((id) => {
+          let pathHistory = path[id];
+          return (
+            <a href="/" key={id} onClick={(e) => handlePathClick(id)}>
+              <p>{pathHistory.currentPath}</p>
+            </a>
+          );
         })}
-</div>
-    )
-}
+      </div>
+    </div>
+  );
+};
 
 export default BreadCrumbs;

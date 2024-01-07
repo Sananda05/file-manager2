@@ -2,13 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import Folders from "./Folders";
 
 import addIcon from "../assets/icon/plus.png";
-import folderIcon from "../assets/icon/folder.png";
 
 import "./FileManager.css";
 
 import AddFolderModal from "../component/modal/AddFolderModal";
 import { SortFolder } from "../utils/SortFolderfunction";
 import { AddNewFolder } from "../utils/AddNewFolder";
+import BreadCrumbs from "./BreadCrumbs";
 
 function FileManager() {
   const [parent, setParent] = useState(0);
@@ -45,23 +45,6 @@ function FileManager() {
     setIsOpen(!isOpen);
   };
 
-  const handlePathClick = (id) => {
-    const filteredPath = path.filter((item, index) => index <= id);
-
-    setPath(filteredPath);
-
-    let clickedPath = path[id];
-
-    // console.log("clickedPath", clickedPath)
-
-    if (clickedPath.id === "") {
-      setParent(0);
-    } else {
-      setParent(clickedPath.id);
-    }
-    // console.log(clickedPath.id)
-  };
-
   return (
     <div className="main_container">
       <div className="add_button" onClick={handleModalOpener}>
@@ -72,34 +55,8 @@ function FileManager() {
         />
         <p style={{ fontSize: "14px" }}>Add New Folder</p>
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center",
-          marginTop: "5rem",
-          gap: "10px",
-        }}
-      >
-        <img
-          src={folderIcon}
-          alt="folder"
-          style={{ height: "16px", width: "16px", marginLeft: "7rem" }}
-        />
-        <div className="file_path">
-          {Object.keys(path).map((id) => {
-            let pathHistory = path[id];
-            return (
-              <a href="/" key={id} onClick={(e) => handlePathClick(id)}>
-                <p>{pathHistory.currentPath}</p>
-              </a>
-            );
-          })}
-        </div>
-      </div>
+      <BreadCrumbs path={path} setPath={setPath} setParent={setParent} />
 
-      {/* <BreadCrumbs parent={parent} folders={folders} setFolders={setFolders} setParent={setParent}/> */}
       <div className="header_section">
         <h4
           style={{
