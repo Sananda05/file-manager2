@@ -2,11 +2,11 @@ import React from "react";
 import { useState } from "react";
 
 import folderIcon from "../assets/icon/folder.png";
-import deleteIcon from "../assets/icon/remove.png";
 import optionIcon from "../assets/icon/options.png";
 
 import "./Folders.css";
-// import AlertModal from "../component/navbar/AlertModal";
+import AlertModal from "../component/modal/AlertModal";
+import OptionModal from "../component/modal/OptionModal";
 
 const Folders = ({
   parent,
@@ -17,32 +17,26 @@ const Folders = ({
   setPath,
   color,
   setcolor,
+  selectedId,
+  setselectedId,
 }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [optionModal, setOptionModal] = useState(false);
 
-  const [selectedId, setselectedId] = useState(null);
+  // const [selectedId, setselectedId] = useState(null);
   const [deleteParentId, setDeleteParentId] = useState(null);
 
   const colorList = ["#f67f90", "green", "yellow", "purple"];
 
   const handleFolderColor = (color) => {
-    setcolor(color);
-
-    Object.keys(folders).map((id) => {
-      let thisFolder = folders[id];
-      if (id === selectedId) {
-        thisFolder.color = color;
-      }
-    });
-
-    // folders.map(item => {
-    //     if (item.id === itemId) {
-    //       // Update the color property
-    //       return { ...item, color: 'newColor' }; // Replace 'newColor' with the desired color
-    //     }
-    //     return item;
-    // }
+    // setcolor(color);
+    setFolders((prevFolders) => ({
+      ...prevFolders,
+      [selectedId]: {
+        ...prevFolders[selectedId],
+        color: color,
+      },
+    }));
   };
 
   const handleOptionModal = (parent, id) => {
@@ -64,6 +58,8 @@ const Folders = ({
   const handleFolderOpen = (id, name) => {
     setParent(id);
 
+    setselectedId(id);
+
     let newPath = "/" + name;
 
     let temp_path = [...path];
@@ -77,10 +73,16 @@ const Folders = ({
 
   const deletefolder = (parentId, id) => {
     const updatedFolders = { ...folders };
+
     const childList = updatedFolders[id].childs;
+
+    console.log("Child List", childList);
 
     for (let i = 0; i < childList.length; i++) {
       const child = childList[i];
+
+      deletefolder(updatedFolders[id], child);
+      console.log(updatedFolders[id], child);
       delete updatedFolders[child];
     }
 
@@ -102,16 +104,12 @@ const Folders = ({
           let thisFolder = folders[id];
 
           if (thisFolder.parent !== parent) return null;
-
-          // console.log("folder ID", id)
-          // console.log(selectedId)
-
           return (
             <div
               key={id}
               className={`folder_content `}
               style={{
-                backgroundColor: selectedId === id ? color : thisFolder.color,
+                backgroundColor: thisFolder.color,
               }}
             >
               <div
@@ -141,94 +139,20 @@ const Folders = ({
         })}
 
         {optionModal && (
-          <div className="option_modal">
-            <div className="option_modal-content">
-              <div className="color_option">
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "94%",
-                  }}
-                >
-                  <p style={{ paddingLeft: "10px" }}> Change Color</p>
-                  <p
-                    style={{
-                      color: "#969696",
-                      fontSize: "14px",
-                      cursor: "pointer",
-                    }}
-                    onClick={handleOptionModal}
-                  >
-                    X
-                  </p>
-                </div>
-                <div>
-                  <p style={{ fontSize: "10px", color: "gray" }}>Pick color</p>
-                  <div style={{ display: "flex", flexDirection: "row" }}>
-                    {colorList.map((color, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          width: "30px",
-                          height: "30px",
-                          borderRadius: "50%",
-                          backgroundColor: color,
-                          margin: "10px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleFolderColor(color)}
-                      ></div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  width: "100%",
-                  height: "1px",
-                  backgroundColor: "gray",
-                }}
-              ></div>
-              <div>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    height: "35px",
-                    width: "200px",
-                    borderRadius: "5px",
-                    backgroundColor: "#f0dcdc",
-                    paddingTop: "12px",
-                    cursor: "pointer",
-                  }}
-                  onClick={handleAlertModal}
-                >
-                  Move to trash
-                </p>
-              </div>
-            </div>
-          </div>
+          <OptionModal
+            handleOptionModal={handleOptionModal}
+            colorList={colorList}
+            handleFolderColor={handleFolderColor}
+            handleAlertModal={handleAlertModal}
+            color={color}
+          />
         )}
 
         {showAlert && (
-          <div className="alert_modal">
-            <div className="alert_modal-content">
-              <h4>Are you sure, you want to delete this folder?</h4>
-              <div className="alert_modal_button_group">
-                <button className="cancel_btn" onClick={handleAlertModal}>
-                  cancel
-                </button>
-                <button
-                  className="create_btn"
-                  onClick={handleDeleteConfirmation}
-                >
-                  Yes
-                </button>
-              </div>
-            </div>
-          </div>
+          <AlertModal
+            handleAlertModal={handleAlertModal}
+            handleDeleteConfirmation={handleDeleteConfirmation}
+          />
         )}
       </div>
     </div>
