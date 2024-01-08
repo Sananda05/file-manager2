@@ -3,6 +3,7 @@ const OptionModal = ({
   colorList,
   handleFolderColor,
   handleAlertModal,
+  color,
 }) => {
   return (
     <div className="option_modal">
@@ -48,6 +49,17 @@ const OptionModal = ({
               ))}
             </div>
           </div>
+          {/* <input
+            style={{
+              height: "30px",
+              width: "30px",
+              borderRadius: "50%",
+              background: `linear-gradient(to right, #fff, ${color})`,
+            }}
+            type="color"
+            value={""}
+            onChange={""}
+          /> */}
         </div>
         <div
           style={{
