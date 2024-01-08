@@ -6,8 +6,8 @@ import addIcon from "../assets/icon/plus.png";
 import "./FileManager.css";
 
 import AddFolderModal from "../component/modal/AddFolderModal";
-import { SortFolder } from "../utils/SortFolderfunction";
-import { AddNewFolder } from "../utils/AddNewFolder";
+import { handleSortFolder } from "../utils/SortFolderfunction";
+import { createNewFolder } from "../utils/AddNewFolder";
 import BreadCrumbs from "./BreadCrumbs";
 
 function FileManager() {
@@ -19,6 +19,8 @@ function FileManager() {
 
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [selectedId, setselectedId] = useState(null);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const folderNameRef = useRef("");
@@ -26,15 +28,7 @@ function FileManager() {
   const [folders, setFolders] = useState(() => {
     const storedFolders = localStorage.getItem("folders");
 
-    return storedFolders
-      ? JSON.parse(storedFolders)
-      : {
-          //   id1: { title: 'Folder 1', parent: 0, childs: ['id4', 'id5'], color:color },
-          //   id2: { title: 'Folder 2', parent: 0, childs: ['id3'], color:color },
-          //   id3: { title: 'Folder 2.1', parent: 'id2', childs: [], color:color },
-          //   id4: { title: 'Folder 1.1', parent: 'id1', childs: [], color:color },
-          //   id5: { title: 'Folder 1.2', parent: 'id1', childs: [], color:color },
-        };
+    return storedFolders ? JSON.parse(storedFolders) : {};
   });
 
   useEffect(() => {
@@ -43,6 +37,43 @@ function FileManager() {
 
   const handleModalOpener = (e) => {
     setIsOpen(!isOpen);
+  };
+
+  const handleAddNewFolder = () => {
+    if (folderNameRef.current.value === "") {
+      setErrorMessage("Please enter a folder name.");
+      return;
+    }
+
+    const newFolderId = `id${Object.keys(folders).length + 1}`;
+    const newFolder = {
+      title: folderNameRef.current.value,
+      parent,
+      childs: [],
+    };
+
+    setFolders((prevFolders) => {
+      if (selectedId === parent) {
+        console.log(prevFolders[selectedId], "Prev Folders");
+        console.log(selectedId, parent);
+        console.log({ prev: prevFolders[parent].childs });
+
+        if (!prevFolders[parent].childs.includes(newFolderId)) {
+          prevFolders[parent].childs = [
+            ...prevFolders[parent].childs,
+            newFolderId,
+          ];
+        }
+      }
+      return {
+        ...prevFolders,
+        [newFolderId]: newFolder,
+      };
+    });
+
+    setIsOpen(!isOpen);
+    setErrorMessage("");
+    folderNameRef.current.value = "";
   };
 
   return (
@@ -70,7 +101,7 @@ function FileManager() {
         </h4>
         <button
           className="sort_button"
-          onClick={() => SortFolder({ folders, setFolders })}
+          onClick={() => handleSortFolder({ folders, setFolders })}
         >
           Sort A~Z
         </button>
@@ -85,23 +116,14 @@ function FileManager() {
         setPath={setPath}
         color={color}
         setcolor={setcolor}
+        selectedId={selectedId}
+        setselectedId={setselectedId}
       />
 
       {isOpen ? (
         <AddFolderModal
           isOpen={isOpen}
-          handleAddNewFolder={(e) =>
-            AddNewFolder({
-              e,
-              folderNameRef,
-              setErrorMessage,
-              folders,
-              setFolders,
-              parent,
-              setIsOpen,
-              isOpen,
-            })
-          }
+          handleAddNewFolder={handleAddNewFolder}
           folderNameRef={folderNameRef}
           errorMessage={errorMessage}
           handleModalOpener={handleModalOpener}

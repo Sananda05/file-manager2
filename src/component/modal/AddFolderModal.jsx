@@ -1,3 +1,6 @@
+import { computeHeadingLevel } from "@testing-library/react";
+import { useRef, useEffect } from "react";
+
 const AddFolderModal = ({
   isOpen,
   handleAddNewFolder,
@@ -5,17 +8,40 @@ const AddFolderModal = ({
   errorMessage,
   handleModalOpener,
 }) => {
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        // Clicked outside the modal, close it
+        handleModalOpener();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isOpen, handleModalOpener]);
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      handleAddNewFolder(e);
+      handleAddNewFolder();
     }
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleAddNewFolder();
+  };
   return (
-    <div className="modal_container">
+    <div className="modal_container" ref={modalRef}>
       <div className={`modal ${isOpen ? "open" : ""}`}>
         <div className="modal-content">
-          <form onSubmit={handleAddNewFolder}>
+          <form onSubmit={handleSubmit}>
             <input
               type="text"
               placeholder="Folder Name"

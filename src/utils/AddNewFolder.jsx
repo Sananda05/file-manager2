@@ -1,5 +1,6 @@
-export const AddNewFolder = ({
-  e,
+import { computeHeadingLevel } from "@testing-library/react";
+
+export const createNewFolder = ({
   folderNameRef,
   setErrorMessage,
   folders,
@@ -7,9 +8,8 @@ export const AddNewFolder = ({
   parent,
   setIsOpen,
   isOpen,
+  selectedId,
 }) => {
-  e.preventDefault();
-
   if (folderNameRef.current.value === "") {
     setErrorMessage("Please enter a folder name.");
     return;
@@ -23,10 +23,19 @@ export const AddNewFolder = ({
   };
 
   setFolders((prevFolders) => {
-    if (prevFolders[parent]) {
-      prevFolders[parent]?.childs.push(newFolderId);
-    }
+    console.log("hi");
+    if (selectedId === parent) {
+      console.log(prevFolders[selectedId], "Prev Folders");
+      console.log(selectedId, parent);
+      console.log({ prev: prevFolders[parent].childs });
 
+      if (!prevFolders[parent].childs.includes(newFolderId)) {
+        prevFolders[parent].childs = [
+          ...prevFolders[parent].childs,
+          newFolderId,
+        ];
+      }
+    }
     return {
       ...prevFolders,
       [newFolderId]: newFolder,

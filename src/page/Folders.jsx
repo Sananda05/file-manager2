@@ -17,24 +17,26 @@ const Folders = ({
   setPath,
   color,
   setcolor,
+  selectedId,
+  setselectedId,
 }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [optionModal, setOptionModal] = useState(false);
 
-  const [selectedId, setselectedId] = useState(null);
+  // const [selectedId, setselectedId] = useState(null);
   const [deleteParentId, setDeleteParentId] = useState(null);
 
   const colorList = ["#f67f90", "green", "yellow", "purple"];
 
   const handleFolderColor = (color) => {
-    setcolor(color);
-
-    Object.keys(folders).map((id) => {
-      let thisFolder = folders[id];
-      if (id === selectedId) {
-        thisFolder.color = color;
-      }
-    });
+    // setcolor(color);
+    setFolders((prevFolders) => ({
+      ...prevFolders,
+      [selectedId]: {
+        ...prevFolders[selectedId],
+        color: color,
+      },
+    }));
   };
 
   const handleOptionModal = (parent, id) => {
@@ -56,6 +58,8 @@ const Folders = ({
   const handleFolderOpen = (id, name) => {
     setParent(id);
 
+    setselectedId(id);
+
     let newPath = "/" + name;
 
     let temp_path = [...path];
@@ -69,10 +73,16 @@ const Folders = ({
 
   const deletefolder = (parentId, id) => {
     const updatedFolders = { ...folders };
+
     const childList = updatedFolders[id].childs;
+
+    console.log("Child List", childList);
 
     for (let i = 0; i < childList.length; i++) {
       const child = childList[i];
+
+      deletefolder(updatedFolders[id], child);
+      console.log(updatedFolders[id], child);
       delete updatedFolders[child];
     }
 
@@ -99,7 +109,7 @@ const Folders = ({
               key={id}
               className={`folder_content `}
               style={{
-                backgroundColor: selectedId === id ? color : thisFolder.color,
+                backgroundColor: thisFolder.color,
               }}
             >
               <div
@@ -134,6 +144,7 @@ const Folders = ({
             colorList={colorList}
             handleFolderColor={handleFolderColor}
             handleAlertModal={handleAlertModal}
+            color={color}
           />
         )}
 
