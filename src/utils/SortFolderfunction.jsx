@@ -1,24 +1,28 @@
-export const SortFolder = ({ folders, setFolders }) => {
-  const foldersArray = Object.entries(folders).map(([key, value]) => ({
-    id: key,
-    ...value,
-  }));
+export const handleSortFolder = ({ folders, setFolders }) => {
+  const sortedFoldersArray = Object.entries(folders).sort(([, a], [, b]) =>
+    a.title.toLowerCase().localeCompare(b.title.toLowerCase())
+  );
 
-  console.log("folders Array", foldersArray);
+  // const foldersArray = Object.entries(folders);
 
-  foldersArray.sort((folder1, folder2) => {
-    if (folder1.title.toLowerCase() < folder2.title.toLowerCase()) {
-      return -1;
-    }
-    if (folder1.title > folder2.title) {
-      return 1;
-    }
-    return 0;
-  });
+  // console.log("folders Array", foldersArray);
 
-  const sortedFolders = Object.assign({}, foldersArray);
+  // foldersArray.sort((folder1, folder2) => {
+  //   console.log(folder1, folder2);
+  //   // if (folder1.title.toLowerCase() < folder2.title.toLowerCase()) {
+  //   //   return -1;
+  //   // }
+  //   // if (folder1.title > folder2.title) {
+  //   //   return 1;
+  //   // }
+  //   // return 0;
+  // });
 
-  console.log(folders);
+  // const sortedFolders = Object.fromEntries(foldersArray);
+
+  const sortedFolders = Object.fromEntries(sortedFoldersArray);
+
+  console.log(sortedFolders);
 
   setFolders(sortedFolders);
 };
